@@ -231,6 +231,7 @@ int main(int argc, char **argv)
             alignedTF.frame_id_ = std::string("map");
             alignedTF.child_frame_id_ = std::string("spatialAnchor_ros");
 
+            tf_map2anchor = alignedTF;
             // #################################################
 
             // obtain new SA position (temporal)
