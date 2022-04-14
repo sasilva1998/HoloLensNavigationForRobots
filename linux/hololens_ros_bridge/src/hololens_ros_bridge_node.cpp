@@ -21,6 +21,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include "pcl_ros/point_cloud.h"
+
 const char *pszAppName = "hololens_ros_bridge";
 bool sendMsg = false;
 bool recvTF = false;
@@ -155,11 +157,20 @@ int main(int argc, char **argv)
     bool transBool = false;
     sensor_msgs::PointCloud pointcloud;
 
+    unsigned int i = 1;
+
     while (ros::ok())
     {
+        i++;
+
         askState = Default_Ask_Pose;
 
-        sendMsg = True;
+        if(i% 2 == 0){
+            sendMsg = true;
+        } else {
+            sendMsg = false;
+        }
+        
 
         if (sendMsg)
         { // if receiving localization initialization from anchor localizer
@@ -169,7 +180,7 @@ int main(int argc, char **argv)
             sendMsg = false;
         }
 
-        recvTF = False;
+        recvTF = false;
 
         if (recvTF)
         { // if receiving alignment result from anchor localizer
@@ -206,15 +217,15 @@ int main(int argc, char **argv)
             // receive transformation of (old SA-new SA) in HoloLens
             recvMessage(sock, sizeof(float) * 16, (char *)cameraPosition);
 
-            Eigen::Matrix4d anc2anc;
-            anc2anc << cameraPosition[0], cameraPosition[4], cameraPosition[8], cameraPosition[12],
-                cameraPosition[1], cameraPosition[5], cameraPosition[9], cameraPosition[13],
-                cameraPosition[2], cameraPosition[6], cameraPosition[10], cameraPosition[14],
-                cameraPosition[3], cameraPosition[7], cameraPosition[11], cameraPosition[15];
+            // Eigen::Matrix4d anc2anc;
+            // anc2anc << cameraPosition[0], cameraPosition[4], cameraPosition[8], cameraPosition[12],
+            //     cameraPosition[1], cameraPosition[5], cameraPosition[9], cameraPosition[13],
+            //     cameraPosition[2], cameraPosition[6], cameraPosition[10], cameraPosition[14],
+            //     cameraPosition[3], cameraPosition[7], cameraPosition[11], cameraPosition[15];
 
             // ######### dummy transform #################
 
-            alignedTF.setOrigin(tf::Vector3(0, 0, keptHeight));
+            alignedTF.setOrigin(tf::Vector3(1, 1, keptHeight));
 
             tf::Quaternion initq(
                 0,
@@ -237,10 +248,10 @@ int main(int argc, char **argv)
             // obtain new SA position (temporal)
             Eigen::Matrix4d map2anc = tf2EigenMat(tf_map2anchor);
             std::cout << pszAppName << ": old anchor to new anchor " << std::endl;
-            std::cout << /* std::setw(16) << */ anc2anc << std::endl;
+            // std::cout << /* std::setw(16) << */ anc2anc << std::endl;
 
             // tf:[map-new SA (ROS)] = (map - old SA) * (Ros-HoloLens) * (old SA-new SA) * (HoloLens - ROS)
-            map2anc = map2anc * tf2EigenMat(tf_hololens2ros) * anc2anc * tf2EigenMat(tf_hololens2ros).inverse();
+            // map2anc = map2anc * tf2EigenMat(tf_hololens2ros) * anc2anc * tf2EigenMat(tf_hololens2ros).inverse();
             std::cout << pszAppName << ": map to new anchor " << std::endl;
             std::cout << /* std::setw(16) << */ map2anc << std::endl;
 
@@ -378,7 +389,7 @@ int main(int argc, char **argv)
                 cameraPosition[3], cameraPosition[7], cameraPosition[11], cameraPosition[15];
 
             tf_anchor2camera = EigenMat2tf(anc2cam);
-            tf_anchor2camera.frame_id_ = std::string("spatialAnchor");
+            tf_anchor2camera.frame_id_ = std::string("map");
             tf_anchor2camera.child_frame_id_ = std::string("hololens");
             tf_anchor2camera.stamp_ = ros::Time::now();
             // broadcast
@@ -426,14 +437,14 @@ int main(int argc, char **argv)
 
         // broadcast tf
         tf_map2anchor.stamp_ = tf_anchor2camera.stamp_;
-        tf_br_.sendTransform(tf_map2anchor);
+        // tf_br_.sendTransform(tf_map2anchor);
         tf_hololens2ros.stamp_ = ros::Time::now();
-        tf_br_.sendTransform(tf_hololens2ros);
+        // tf_br_.sendTransform(tf_hololens2ros);
 
         if (transBool)
         {
             // publish point cloud if receivint it from HoloLens
-            pointcloud.header.frame_id = "spatialAnchor";
+            pointcloud.header.frame_id = "hololens";
             pointcloud.header.stamp = ros::Time::now();
             pub.publish(pointcloud);
             transBool = false;

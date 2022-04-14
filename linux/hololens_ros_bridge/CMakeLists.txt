@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   tf
+  pcl_ros
+  pcl_conversions
 )
 
 find_package(Eigen3 REQUIRED NO_MODULE)
@@ -109,7 +111,7 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES hololens_ros_bridge
 #  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
+ DEPENDS PCL
 )
 
 ###########
@@ -122,6 +124,7 @@ include_directories(
 include
 ${catkin_INCLUDE_DIRS}
 ${Eigen3_INCLUDE_DIRS}
+${PCL_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
