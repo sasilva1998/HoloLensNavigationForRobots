@@ -171,72 +171,77 @@ bool HoloLensNavigationMain::InternalUpdate(HolographicFrame^ holographicFrame)
             }
         }
 
-        // new anchor create
-        if (m_replyedState == EnumRepliedState::Reply_Anchor_Pose_Map) {
-            Platform::IBox<HolographicStereoTransform>^ viewTransformContainer = cameraPose->TryGetViewTransform(currentCoordinateSystem);
-            bool viewTransformAcquired = viewTransformContainer != nullptr;
+        if(anchor_update_flag){
 
-            if (viewTransformAcquired)
-            {
-                HolographicStereoTransform viewCoordinateSystemTransform = viewTransformContainer->Value;
-                float4x4 camPosition2 = viewCoordinateSystemTransform.Left;
-                float4x4 viewInverse;
-                bool invertible = Windows::Foundation::Numerics::invert(camPosition2, &viewInverse);
+            // new anchor create
+            if (m_replyedState == EnumRepliedState::Reply_Anchor_Pose_Map) {
+                Platform::IBox<HolographicStereoTransform>^ viewTransformContainer = cameraPose->TryGetViewTransform(currentCoordinateSystem);
+                bool viewTransformAcquired = viewTransformContainer != nullptr;
 
-                if (invertible)
+                if (viewTransformAcquired)
                 {
-                    const float3 campos(viewInverse.m41, viewInverse.m42, viewInverse.m43);
-                    float rad = sqrt(viewInverse.m31 * viewInverse.m31 + viewInverse.m33 * viewInverse.m33);
-                    float theta = acos(viewInverse.m33 / rad);
-                    theta = viewInverse.m31 < 0 ? -theta : theta;
-                    const float3 camdirection(viewInverse.m31 / rad, 0, viewInverse.m33 / rad);
-                    const quaternion q(0, sin(theta / 2), 0, cos(theta / 2));
-                    SpatialAnchor^ anchor = SpatialAnchor::TryCreateRelativeTo(currentCoordinateSystem, campos, q);
+                    HolographicStereoTransform viewCoordinateSystemTransform = viewTransformContainer->Value;
+                    float4x4 camPosition2 = viewCoordinateSystemTransform.Left;
+                    float4x4 viewInverse;
+                    bool invertible = Windows::Foundation::Numerics::invert(camPosition2, &viewInverse);
 
-                    if ((anchor != nullptr) && (m_spatialAnchorHelper != nullptr))
+                    if (invertible)
                     {
-                        if (tempState == EnumAskedState::Refresh_Anchor_And_Render_Map)
+                        const float3 campos(viewInverse.m41, viewInverse.m42, viewInverse.m43);
+                        float rad = sqrt(viewInverse.m31 * viewInverse.m31 + viewInverse.m33 * viewInverse.m33);
+                        float theta = acos(viewInverse.m33 / rad);
+                        theta = viewInverse.m31 < 0 ? -theta : theta;
+                        const float3 camdirection(viewInverse.m31 / rad, 0, viewInverse.m33 / rad);
+                        const quaternion q(0, sin(theta / 2), 0, cos(theta / 2));
+                        SpatialAnchor^ anchor = SpatialAnchor::TryCreateRelativeTo(currentCoordinateSystem, campos, q);
+
+                        if ((anchor != nullptr) && (m_spatialAnchorHelper != nullptr))
                         {
-                            m_spatialAnchorHelper->ClearAnchorStore();
-                            m_spatialId = 0;
-                        }
-                        else {
-                            m_spatialId++;
-                        }
-
-                        auto anchorMap = m_spatialAnchorHelper->GetAnchorMap();
-
-                        // Create an identifier for the anchor.
-                        std::wstringstream ss;
-                        ss << "anchor_" << m_spatialId;
-                        std::wstring w_char = ss.str();
-
-                        m_AnchorKey = ref new String(w_char.c_str());
-
-                        if (m_fVerbose) {
-                            OutputDebugStringA((std::string("State: ") + std::to_string(m_internalState) + "\n").c_str());
-                            OutputDebugStringA((std::string("Anchor: ") + std::to_string(m_spatialId) + "\n").c_str());
-                        }
-
-                        SaveAppState();
-
-                        {
-                            if (m_baseAnchor == nullptr) {
-                                m_baseAnchor = anchor;
+                            if (tempState == EnumAskedState::Refresh_Anchor_And_Render_Map)
+                            {
+                                m_spatialAnchorHelper->ClearAnchorStore();
+                                m_spatialId = 0;
                             }
-                            const auto tryTransform = anchor->CoordinateSystem->TryGetTransformTo(m_baseAnchor->CoordinateSystem);
-                            m_initNewAnchorPositionFromPrevAnchor = tryTransform->Value;
-                            m_baseAnchor = anchor;
-                            currentCoordinateSystem = m_baseAnchor->CoordinateSystem;
-                            anchorMap->Insert(m_AnchorKey->ToString(), anchor);
-                            m_replyedState = EnumRepliedState::Reply_Anchor_Pose_Map;
+                            else {
+                                m_spatialId++;
+                            }
+
+                            auto anchorMap = m_spatialAnchorHelper->GetAnchorMap();
+
+                            // Create an identifier for the anchor.
+                            std::wstringstream ss;
+                            ss << "anchor_" << m_spatialId;
+                            std::wstring w_char = ss.str();
+
+                            m_AnchorKey = ref new String(w_char.c_str());
+
+                            if (m_fVerbose) {
+                                OutputDebugStringA((std::string("State: ") + std::to_string(m_internalState) + "\n").c_str());
+                                OutputDebugStringA((std::string("Anchor: ") + std::to_string(m_spatialId) + "\n").c_str());
+                            }
+
+                            SaveAppState();
+
+                            {
+                                if (m_baseAnchor == nullptr) {
+                                    m_baseAnchor = anchor;
+                                }
+                                const auto tryTransform = anchor->CoordinateSystem->TryGetTransformTo(m_baseAnchor->CoordinateSystem);
+                                m_initNewAnchorPositionFromPrevAnchor = tryTransform->Value;
+                                m_baseAnchor = anchor;
+                                currentCoordinateSystem = m_baseAnchor->CoordinateSystem;
+                                anchorMap->Insert(m_AnchorKey->ToString(), anchor);
+                                m_replyedState = EnumRepliedState::Reply_Anchor_Pose_Map;
+                            }
                         }
                     }
-                }
 
+                }
             }
         }
 
+        anchor_update_flag = false;
+        
         Windows::Foundation::Numerics::invert(camPosition, &m_curPositionFromAnchor);
     }
 

@@ -227,6 +227,8 @@ private:
         //
         // log output flag
         bool                                                                m_fVerbose;
+
+        bool                                                                anchor_update_flag = true;
     };
 
 } // namespace HoloLensNavigation
