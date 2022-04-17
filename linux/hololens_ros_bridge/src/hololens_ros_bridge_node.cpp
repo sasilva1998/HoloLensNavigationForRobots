@@ -165,12 +165,14 @@ int main(int argc, char **argv)
 
         askState = Default_Ask_Pose;
 
-        if(i% 2 == 0){
+        if (i % 2 == 0)
+        {
             sendMsg = true;
-        } else {
+        }
+        else
+        {
             sendMsg = false;
         }
-        
 
         if (sendMsg)
         { // if receiving localization initialization from anchor localizer
@@ -444,7 +446,7 @@ int main(int argc, char **argv)
         if (transBool)
         {
             // publish point cloud if receivint it from HoloLens
-            pointcloud.header.frame_id = "hololens";
+            pointcloud.header.frame_id = "mapp";
             pointcloud.header.stamp = ros::Time::now();
             pub.publish(pointcloud);
             transBool = false;
