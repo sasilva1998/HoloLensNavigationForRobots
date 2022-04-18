@@ -1,4 +1,33 @@
-<?xml version="1.0"?>
 <launch>
-    <node pkg="tf" type="static_transform_publisher" name="virtual_joint_broadcaster_1" args="0 0 0 -1.57 0 1.57 map mapp 100" />
+
+    <arg name="hololens_ip" default="192.168.1.185" />
+    <arg name="hololens_port" default="1234" />
+
+    <!-- hololens frames -->
+    <arg name="parent_frame" default="map" />
+
+    <!-- pointcloud frames -->
+    <arg name="pc_parent_frame" default="map" />
+    <arg name="pc_child_frame" default="hololens_pc" />
+
+    <!-- pointcloud relative frame position from parent_frame -->
+    <arg name="relative_pc_x" default="0" />
+    <arg name="relative_pc_y" default="0" />
+    <arg name="relative_pc_z" default="0" />
+
+    <arg name="relative_pc_roll" default="-1.57" />
+    <arg name="relative_pc_pitch" default="0" />
+    <arg name="relative_pc_yaw" default="1.57" />
+
+    <!-- hololens bridge node -->
+    <node pkg="hololens_ros_bridge" type="hololens_ros_bridge_node" name="hololens_ros_bridge_node" output="screen">
+        <arg name="hololens_ip" value="$(arg hololens_ip)" />
+        <arg name="hololens_port" value="$(arg hololens_port)" />
+        <arg name="parent_frame" value="$(arg parent_frame)" />
+        <arg name="pc_parent_frame" value="$(arg pc_parent_frame)" />
+        <arg name="pc_child_frame" value="$(arg pc_child_frame)" />
+    </node>
+
+    <!-- pointcloude transforms -->
+    <node pkg="tf" type="static_transform_publisher" name="super_frame_to_pointcloud_node" args="$(arg relative_pc_x) $(arg relative_pc_y) $(arg relative_pc_z) $(arg relative_pc_roll) $(arg relative_pc_pitch) $(arg relative_pc_yaw) $(arg pc_parent_frame) $(arg pc_child_frame) 100" />
 </launch>
