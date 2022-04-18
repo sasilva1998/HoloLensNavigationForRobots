@@ -100,6 +100,10 @@ int main(int argc, char **argv)
     const int port = std::stoi(argv[2]);
     const char *ip_address = argv[1];
 
+    // rest of parameters set
+    std::string parent_frame = argv[3];
+    std::string pc_child_frame = argv[4];
+
     ROS_INFO("Socket trying to connect to %s:%i...", ip_address, port);
 
     int sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -391,7 +395,7 @@ int main(int argc, char **argv)
                 cameraPosition[3], cameraPosition[7], cameraPosition[11], cameraPosition[15];
 
             tf_anchor2camera = EigenMat2tf(anc2cam);
-            tf_anchor2camera.frame_id_ = std::string("map");
+            tf_anchor2camera.frame_id_ = std::string(parent_frame);
             tf_anchor2camera.child_frame_id_ = std::string("hololens");
             tf_anchor2camera.stamp_ = ros::Time::now();
             // broadcast
@@ -446,7 +450,7 @@ int main(int argc, char **argv)
         if (transBool)
         {
             // publish point cloud if receivint it from HoloLens
-            pointcloud.header.frame_id = "mapp";
+            pointcloud.header.frame_id = pc_child_frame;
             pointcloud.header.stamp = ros::Time::now();
             pub.publish(pointcloud);
             transBool = false;
