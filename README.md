@@ -3,6 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
 
 # HoloLens Navigation for Robots
+
+> In this fork, it is desired to simply establish a complete general connection between the hololens and ROS. This means, for the Hololens to send the measurements from its sensors to ROS arbitrarily. The workaround of this for is explained in [Hololens ROS Bridge](./HOLOLENS_ROS_BRIDGE.md).
+
 Welcome! The example system in this repository shows how a [**HoloLens**](https://www.microsoft.com/en-us/hololens) device can be placed on the head of [**Pepper robot**](https://us.softbankrobotics.com/pepper) and provide it with a self-calibrating indoor navigation solution. The calibration process is described in detail in the paper: [**Dynamic Calibration between a Mobile Robot and SLAM Device for Navigation**](https://www.cvl.iis.u-tokyo.ac.jp/data/uploads/papers/Ishikawa_SLAMDevice_ROMAN2019.pdf) and is demonstrated in the video below ***(click image to download video)*** **:**
 
 [![Project Video](img/HoloLensNavigation_ICRA18_1498_VI_i.png)](https://github.com/microsoft/HoloLensNavigationForRobots/raw/main/img/ICRA18_1498_VI_i.mp4 "Project Video")
