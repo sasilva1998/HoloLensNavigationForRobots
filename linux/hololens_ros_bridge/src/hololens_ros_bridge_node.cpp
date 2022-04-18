@@ -85,16 +85,16 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     // initial localization request
-    ros::Subscriber testsubsc = nh.subscribe("/hololens/ack", 1000, callbackTest);
+    // ros::Subscriber testsubsc = nh.subscribe("/hololens/ack", 1000, callbackTest);
 
     // alignement result from anchor localizer
-    ros::Subscriber locsubsc = nh.subscribe("/hololens/localized", 1000, callback_aligned);
+    // ros::Subscriber locsubsc = nh.subscribe("/hololens/localized", 1000, callback_aligned);
 
     // point cloud from HoloLens
     ros::Publisher pub = nh.advertise<sensor_msgs::PointCloud>("/hololens/pc", 1000);
 
     // floor surface normal
-    ros::Publisher pub2 = nh.advertise<geometry_msgs::PoseStamped>("/hololens/floor_normal", 1000);
+    // ros::Publisher pub2 = nh.advertise<geometry_msgs::PoseStamped>("/hololens/floor_normal", 1000);
 
     // port, ip_address of HoloLens (port should be 1234)
     const int port = std::stoi(argv[2]);
