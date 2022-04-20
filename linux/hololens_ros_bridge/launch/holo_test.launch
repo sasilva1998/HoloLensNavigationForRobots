@@ -23,5 +23,5 @@
     <node pkg="hololens_ros_bridge" type="hololens_ros_bridge_node" name="hololens_ros_bridge_node" output="screen" args="$(arg hololens_ip) $(arg hololens_port) $(arg parent_frame) $(arg pc_child_frame)" />
 
     <!-- pointcloude transforms -->
-    <node pkg="tf" type="static_transform_publisher" name="super_frame_to_pointcloud_node" args="$(arg relative_pc_x) $(arg relative_pc_y) $(arg relative_pc_z) $(arg relative_pc_roll) $(arg relative_pc_pitch) $(arg relative_pc_yaw) $(arg pc_parent_frame) $(arg pc_child_frame) 100" />
+    <!-- <node pkg="tf" type="static_transform_publisher" name="super_frame_to_pointcloud_node" args="$(arg relative_pc_x) $(arg relative_pc_y) $(arg relative_pc_z) $(arg relative_pc_roll) $(arg relative_pc_pitch) $(arg relative_pc_yaw) $(arg pc_parent_frame) $(arg pc_child_frame) 100" /> -->
 </launch>
