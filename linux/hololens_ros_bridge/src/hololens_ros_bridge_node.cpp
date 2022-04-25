@@ -161,22 +161,24 @@ int main(int argc, char **argv)
     bool transBool = false;
     sensor_msgs::PointCloud pointcloud;
 
-    unsigned int i = 1;
+    unsigned int j = 2;
 
     while (ros::ok())
     {
-        i++;
+        j++;
 
         askState = Default_Ask_Pose;
 
-        if (i % 2 == 0)
-        {
-            sendMsg = true;
-        }
-        else
-        {
-            sendMsg = false;
-        }
+        // if (j % 2 == 0)
+        // {
+        //     sendMsg = true;
+        // }
+        // else
+        // {
+        //     sendMsg = false;
+        // }
+
+        sendMsg = true;
 
         if (sendMsg)
         { // if receiving localization initialization from anchor localizer
@@ -430,7 +432,7 @@ int main(int argc, char **argv)
             floor2holo.pose.orientation.z = rotAx(2) * sin(angle / 2);
             floor2holo.pose.orientation.w = cos(angle / 2);
 
-            pub2.publish(floor2holo);
+            // pub2.publish(floor2holo);
 
             // set new SA's height (does not affect the calculations)
             if (repState == Recv_Anchor_Pose_Map)
